@@ -33,7 +33,18 @@ export default function Home() {
         body: JSON.stringify({ url: trimmedUrl }),
       });
 
-      const data = (await response.json()) as Partial<SummaryData> & { error?: string };
+      const responseText = await response.text();
+      const contentType = response.headers.get("content-type") || "";
+
+      if (!contentType.includes("application/json")) {
+        throw new Error(
+          responseText.trim().startsWith("<")
+            ? "线上接口返回了网页而不是 JSON。请检查 Vercel 是否已重新部署最新代码，以及 /api/summarize 是否存在。"
+            : "线上接口返回格式异常，请稍后重试。",
+        );
+      }
+
+      const data = JSON.parse(responseText) as Partial<SummaryData> & { error?: string };
 
       if (!response.ok) {
         throw new Error(data.error || "摘要生成失败，请稍后再试。");

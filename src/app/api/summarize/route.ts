@@ -6,6 +6,13 @@ import { validateHttpUrl } from "@/lib/validators";
 
 export const runtime = "nodejs";
 
+export function GET() {
+  return NextResponse.json({
+    ok: true,
+    service: "xiaobaiweb summarize api",
+  });
+}
+
 function toClientError(error: unknown) {
   if (error instanceof Error) {
     return error.message;
